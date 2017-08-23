@@ -1,0 +1,38 @@
+---
+# tasks file for filebeat
+- name: Add Elasticsearch GPG key.
+  rpm_key:
+    key: https://packages.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Add Filebeat repository.
+  template:
+    src: beats.repo.j2
+    dest: /etc/yum.repos.d/beats.repo
+    mode: 0644
+
+- name: Install Filebeat.
+  package: name=filebeat state=present
+
+- name: Ensure Filebeat is started and enabled at boot.
+  service:
+    name: filebeat
+    state: started
+    enabled: yes
+
+- name: copy certificate key
+  copy: content={{ ssl_certificate_key_content }} dest={{ filebeat_ssl_key }}
+  notify: restart filebeat
+
+- name: copy certificate file
+  copy: src={{ ssl_certificate_cert }} dest={{ filebeat_ssl_crt }}
+  notify: restart filebeat
+
+- name: Copy Filebeat configuration.
+  template:
+    src: filebeat.yml.j2
+    dest: "/etc/filebeat/filebeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart filebeat

@@ -1,0 +1,40 @@
+filebeat:
+  # List of prospectors to fetch data.
+  prospectors:
+{% for prospector in filebeat_prospectors %}
+    -
+      paths:
+{% for file in prospector.files %}
+        - {{ file }}
+{% endfor %}
+      fields:
+        source: {{ ansible_fqdn }}
+        application: {{ prospector.application }}
+      input_type: log
+{% if prospector.java_multiline is defined and prospector.java_multiline == true %}
+      multiline:
+          pattern: '^[[:space:]]+|^Caused by:'
+          negate: false
+          match: after
+{% endif %}
+{% if prospector.erlang_multiline is defined and prospector.erlang_multiline == true %}
+      multiline:
+          pattern: '^[[:space:]]+|^#'
+          negate: false
+          match: after
+{% endif %}
+{% endfor %}
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+output:
+  ### Elasticsearch as output
+  logstash:
+    # Array of hosts to connect to.
+    hosts: ["{{ filebeat_graylog_host }}:{{ filebeat_graylog_port }}"]
+    tls:
+      # Certificate for TLS client authentication
+      certificate: {{ filebeat_ssl_crt }}
+      # Client Certificate Key
+      certificate_key: {{ filebeat_ssl_key }}
+      insecure: true

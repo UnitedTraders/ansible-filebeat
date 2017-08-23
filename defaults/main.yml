@@ -1,0 +1,8 @@
+---
+# defaults file for filebeat
+filebeat_graylog_host: "graylog.example.com"
+filebeat_graylog_port: "5044"
+filebeat_ssl_key: "/etc/filebeat/filebeat.key"
+filebeat_ssl_crt: "/etc/filebeat/filebeat.crt"
+filebeat_logfiles:
+  - "/var/log/*.log"
