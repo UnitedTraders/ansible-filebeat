@@ -23,6 +23,12 @@ filebeat:
           negate: false
           match: after
 {% endif %}
+{% if prospector.nodejs_multiline is defined and prospector.nodejs_multiline == true %}
+      multiline:
+          pattern: '^[[:space:]]+'
+          negate: false
+          match: after
+{% endif %}
 {% endfor %}
 
 # Configure what outputs to use when sending the data collected by the beat.
