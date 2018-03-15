@@ -36,3 +36,4 @@
     group: root
     mode: 0644
   notify: restart filebeat
+  when: filebeat_prospectors is defined
